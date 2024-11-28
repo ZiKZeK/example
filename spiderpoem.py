@@ -1,6 +1,7 @@
 URL = "http://www.zggushi.com/gushi/26010.html"
 from os import makedirs
 from os.path import exists
+from bs4 import BeautifulSoup
 
 RESULT_DIR = 'poem'
 exists(RESULT_DIR) or makedirs(RESULT_DIR)
@@ -23,13 +24,17 @@ def scrape_page(url):
 
 
 def parse_detail(html):
+    soup = BeautifulSoup(html, 'lxml')
     title_pattern = re.compile('<h1>(.*?)</h1>')
     author_pattern = re.compile('class="gs-poem-sub">(.*?)</div>')
-    poem_pattern = re.compile('<p>(.*?)<br>(.*?)</p>')
+    # poem_pattern = re.compile('<p>(.*?)<br>(.*?)</p>')
+    poem_node = soup.find('div', class_='gs-works-text')
+    poem = poem_node.div.text if poem_node else None
+
 
     title = re.search(title_pattern, html).group(1) if re.search(title_pattern, html) else None
     author = re.search(author_pattern, html).group(1) if re.search(author_pattern, html) else None
-    poem = re.findall(poem_pattern, html) if re.findall(poem_pattern, html) else []
+    # poem = re.findall(poem_pattern, html) if re.findall(poem_pattern, html) else []
 
     return {"title" : title, "author" : author, "poem" : poem}
 
